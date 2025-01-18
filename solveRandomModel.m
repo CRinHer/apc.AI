@@ -9,7 +9,7 @@ ny = 4;
 model = rss(nx,ny,nu);
 tau = eigs(model.A);
 tau = max(abs(tau));
-tf  = 35;
+tf  = 10*tau;
 
 y_track = struct();
 %Choose a nominal steady-state input u_ss = zeros
@@ -34,15 +34,9 @@ for i = 1:nu
 
     ssInOutMatrix(:,i) = y(end,:)';
     fieldName = sprintf('Field_%d', i);
+    y_track.(fieldName) = y;
 
-    figure;
-    hold on;
-    plot(t,y(:,1),t,y(:,2),t,y(:,3),t,y(:,4))
-end
-
-ssInOutMatrix;
-y_track;
-
-
-
+    %figure;
+    %hold on;
+    %plot(t,y(:,1),t,y(:,2),t,y(:,3),t,y(:,4))
 end
