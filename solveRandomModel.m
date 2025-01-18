@@ -1,4 +1,4 @@
-function y_track = solveRandomModel
+function [y_track,t] = solveRandomModel
 
 %
 nx = 4;
@@ -10,7 +10,9 @@ model = rss(nx,ny,nu);
 tau = eigs(model.A);
 tau = max(abs(tau));
 tf  = 10*tau;
+%adjust tf to set amount of time to capture model
 
+%empty structure to store all data
 y_track = struct();
 %Choose a nominal steady-state input u_ss = zeros
 %Steady-state solution is always x_ss = zeros
@@ -29,14 +31,22 @@ for i = 1:nu
     
     C = model.C;
     D = model.D;
-
+    
     y = (C*x' + D*u)';
 
     ssInOutMatrix(:,i) = y(end,:)';
-    fieldName = sprintf('Field_%d', i);
+    fieldName = sprintf('MV_%d', i);
     y_track.(fieldName) = y;
 
-    %figure;
-    %hold on;
-    %plot(t,y(:,1),t,y(:,2),t,y(:,3),t,y(:,4))
+    %plot 4 plots for each MV (nx)
+    figure;
+    hold on;
+    plot(t,y(:,1),t,y(:,2),t,y(:,3),t,y(:,4))
+end
+
+ssInOutMatrix;
+y_track;
+t;
+
+
 end
