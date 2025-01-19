@@ -3,6 +3,8 @@ import tensorflow as tf
 from tensorflow import keras
 from keras import layers
 import matplotlib as plt
+from keras.callbacks import LambdaCallback
+
 loss_callback = LambdaCallback(on_epoch_end=print_loss)
 
 image_dir = '../generate/preprocessing/Images'  # Replace with the actual path
