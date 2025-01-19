@@ -87,9 +87,7 @@ class Autoencoder(nn.Module):
 
     def forward(self, x):
         encoded = self.encoder(x)
-        print(encoded.shape)
         decoded = self.decoder(encoded)
-        print(decoded.shape)
         return decoded
 
 # Create the autoencoder model
@@ -103,14 +101,15 @@ loss_fn = nn.BCELoss()  # Binary Cross Entropy loss for grayscale images
 def print_loss(epoch, loss):
     print(f"Epoch: {epoch+1}, Loss: {loss}")
 
-for epoch in range(200):
+for epoch in range(5):
+    round = 1
     print(f"Epoch {epoch}")
     total_loss = 0.0
     for data in train_dataloader:
         # Forward pass
         outputs = autoencoder(data)
         loss = loss_fn(outputs, data)
-        print(loss)
+        print(f"Round {round}: {loss}")
 
         # Backward pass and optimization
         optimizer.zero_grad()
@@ -119,16 +118,18 @@ for epoch in range(200):
 
         total_loss += loss.item()
 
+        round += 1
+
     # Print average loss for the epoch
     print_loss(epoch, total_loss / len(train_dataloader))
 
 # You can add code here to save the trained model or use it for inference
-    total_test_loss = 0.0
-    for data in test_dataloader:
-        outputs = autoencoder(data)
-        loss = loss_fn(outputs, data)
-        total_test_loss += loss.item()
-    print(f"Test Loss: {total_test_loss / len(test_dataloader)}")
+total_test_loss = 0.0
+for data in test_dataloader:
+    outputs = autoencoder(data)
+    loss = loss_fn(outputs, data)
+    total_test_loss += loss.item()
+print(f"Test Loss: {total_test_loss / len(test_dataloader)}")
 
 torch.save(autoencoder.state_dict(), 'autoencoder_model.pth')
 
