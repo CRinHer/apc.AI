@@ -9,7 +9,7 @@ ny = 4;
 model = rss(nx,ny,nu);
 tau = eigs(model.A);
 tau = max(abs(tau));
-tf  = 10*tau;
+tf  = 30;
 %adjust tf to set amount of time to capture model
 
 %empty structure to store all data
@@ -23,6 +23,9 @@ y_track = struct();
 x0 = zeros(nx,1);
 u = zeros(nu,1);
 ssInOutMatrix = zeros(ny,nu);
+
+%for i = 1:#ofMVs, generate random linear 4x4 system
+%set MV(i) to 1, then gen how system reacts
 for i = 1:nu
     u(i) = 1;
     fun = @(t,x) odeRhs(t,x,model,u);
