@@ -20,14 +20,14 @@ function App() {
   
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>My Python Application</h1>
+      <h1>apc.AI</h1>
       <button onClick={runApplication} disabled={loading}>
         {loading ? 'Running...' : 'Run Application'}
       </button>
       <div style={{ marginTop: '20px' }}>
         <h2>Outputs</h2>
         <div>
-          <h3>Category 1</h3>
+          <h3>Good</h3>
           <ul>
             {output.category1.map((item, index) => (
               <li key={index}>{item}</li>
@@ -35,7 +35,7 @@ function App() {
           </ul>
         </div>
         <div>
-          <h3>Category 2</h3>
+          <h3>Bad</h3>
           <ul>
             {output.category2.map((item, index) => (
               <li key={index}>{item}</li>
@@ -43,7 +43,7 @@ function App() {
           </ul>
         </div>
         <div>
-          <h3>Category 3</h3>
+          <h3>Review</h3>
           <ul>
             {output.category3.map((item, index) => (
               <li key={index}>{item}</li>
