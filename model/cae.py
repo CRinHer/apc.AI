@@ -4,6 +4,10 @@ print("PIL importing...")
 from PIL import Image
 print("sklearn importing...")
 from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+import matplotlib.animation as animation
 
 print("torch importing...")
 import torch 
@@ -90,52 +94,62 @@ class Autoencoder(nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
-# Create the autoencoder model
-autoencoder = Autoencoder()
+# # Create the autoencoder model
+# autoencoder = Autoencoder()
 
-# Compile the model and define the optimizer
-optimizer = optim.Adam(autoencoder.parameters())
-loss_fn = nn.BCELoss()  # Binary Cross Entropy loss for grayscale images
+# # Compile the model and define the optimizer
+# optimizer = optim.Adam(autoencoder.parameters())
+# loss_fn = nn.BCELoss()  # Binary Cross Entropy loss for grayscale images
 
 # Train the model
 def print_loss(epoch, loss):
     print(f"Epoch: {epoch+1}, Loss: {loss}")
 
-for epoch in range(5):
-    round = 1
-    print(f"Epoch {epoch}")
-    total_loss = 0.0
-    for data in train_dataloader:
-        # Forward pass
-        outputs = autoencoder(data)
-        loss = loss_fn(outputs, data)
-        print(f"Round {round}: {loss}")
+# for epoch in range(5):
+#     round = 1
+#     print(f"Epoch {epoch}")
+#     total_loss = 0.0
+#     for data in train_dataloader:
+#         # Forward pass
+#         outputs = autoencoder(data)
+#         loss = loss_fn(outputs, data)
+#         print(f"Round {round}: {loss}")
 
-        # Backward pass and optimization
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+#         # Backward pass and optimization
+#         optimizer.zero_grad()
+#         loss.backward()
+#         optimizer.step()
 
-        total_loss += loss.item()
+#         total_loss += loss.item()
 
-        round += 1
+#         round += 1
 
-    # Print average loss for the epoch
-    print_loss(epoch, total_loss / len(train_dataloader))
+#     # Print average loss for the epoch
+#     print_loss(epoch, total_loss / len(train_dataloader))
 
 # You can add code here to save the trained model or use it for inference
-total_test_loss = 0.0
-for data in test_dataloader:
-    outputs = autoencoder(data)
-    loss = loss_fn(outputs, data)
-    total_test_loss += loss.item()
-print(f"Test Loss: {total_test_loss / len(test_dataloader)}")
+# total_test_loss = 0.0
+# for data in test_dataloader:
+#     outputs = autoencoder(data)
+#     loss = loss_fn(outputs, data)
+#     total_test_loss += loss.item()
+# print(f"Test Loss: {total_test_loss / len(test_dataloader)}")
 
-torch.save(autoencoder.state_dict(), 'autoencoder_model.pth')
+# torch.save(autoencoder.state_dict(), 'autoencoder_model.pth')
+
+# Load the saved state dictionary
+state_dict = torch.load('autoencoder_model.pth')
+# Create a new instance of the encoder model
+encoder = Autoencoder()
+# Load the state dictionary into the encoder
+encoder.load_state_dict(state_dict)
+encoder = encoder.encoder
 
 
-encoder = autoencoder.encoder  # Get the encoder part
+# encoder = autoencoder.encoder  # Get the encoder part
 
+print("Model Loaded")
+print("Dataset encoding...")
 # Get encoded representations for your dataset
 encoded_data = []
 for data in test_dataloader:  # Or iterate over your test_dataloader
@@ -143,9 +157,33 @@ for data in test_dataloader:  # Or iterate over your test_dataloader
         encoded_batch = encoder(data)
         encoded_data.append(encoded_batch)
 
+print("Dataset Encoded")
+
 # Concatenate the encoded batches into a single tensor
 encoded_data = torch.cat(encoded_data, dim=0)
+encoded_data = encoded_data.reshape(-1, encoded_data.shape[1] * encoded_data.shape[2] * encoded_data.shape[3])
 
+print("Clustering...")
 # Assuming you want to find 3 clusters
-kmeans = KMeans(n_clusters=3)
+kmeans = KMeans(n_clusters=2)
 cluster_labels = kmeans.fit_predict(encoded_data.numpy()) 
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot the clusters in 3D
+ax.scatter(encoded_data[:, 0], encoded_data[:, 1], encoded_data[:, 2], c=cluster_labels)  # Assuming 3 features
+
+ax.set_title('KMeans Clustering (3D)')
+ax.set_xlabel('Oscillation') # How wildly does it oscillate?
+ax.set_ylabel('Conformance') # How quickly does it reach steady state?
+ax.set_zlabel('Stability') # Does it reach steady state?
+
+def animate(i):
+    ax.view_init(elev=30, azim=i)
+    return fig,
+
+# Create the animation
+ani = animation.FuncAnimation(fig, animate, frames=360, interval=20, blit=True)
+
+plt.show() 
